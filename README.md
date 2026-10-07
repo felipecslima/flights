@@ -17,6 +17,24 @@ python3 run.py        # ou ./voos
 
 Na primeira vez ele cria o ambiente (.venv), instala as dependências e cria o `.env`. A fonte padrão é o Skiplagged, que não precisa de chave; a SerpApi só pede chave se você escolher essa fonte. Nas próximas só abre o programa. Outros comandos: `python3 run.py monitor` (monitor de alertas), `python3 run.py test` (testes), `python3 run.py --mock` (preços falsos), `python3 run.py --reset` (recria o ambiente).
 
+## Windows
+
+O código foi escrito para funcionar também no Windows (caminhos do `.venv`, UTF-8 e navegador tratados), mas **ainda não foi testado lá**. Use o Windows Terminal ou PowerShell:
+
+```powershell
+py run.py                 # no lugar de python3 run.py
+py run.py monitor
+```
+
+Agendar às 8h e 20h (no lugar do launchd do Mac), ajustando a pasta:
+
+```powershell
+schtasks /Create /TN "FlightAlerts8" /SC DAILY /ST 08:00 /TR "cmd /c cd /d C:\caminho\flights && .venv\Scripts\python.exe -m flight_alerts >> run.log 2>&1"
+schtasks /Create /TN "FlightAlerts20" /SC DAILY /ST 20:00 /TR "cmd /c cd /d C:\caminho\flights && .venv\Scripts\python.exe -m flight_alerts >> run.log 2>&1"
+```
+
+O `./voos` e o `com.joel.flights.plist` são só do Mac/Linux. A trava do git usa o Git Bash que vem com o Git para Windows.
+
 ## Chaves e canais de alerta
 
 Tudo fica no `.env` (que não vai para o git). O monitor só envia pelos canais listados em `channels:` no `config.yaml`.
@@ -98,6 +116,14 @@ Duas execuções por dia, 4 buscas cada = ~240/mês, dentro da cota grátis:
 ```
 
 Na primeira ou segunda semana o histórico ainda é pequeno: as regras de mediana só entram após `min_samples` coletas, então no início só o `max_price` alerta.
+
+## Git e segurança das chaves
+
+As chaves são **opcionais**: o padrão (Skiplagged) não precisa de nenhuma. Só o Telegram (para receber avisos) e, se você quiser, a SerpApi usam o `.env`.
+
+- O `.gitignore` deixa de fora `.env`, `config.yaml`, bancos `*.db`, logs e as saídas dos scripts de diagnóstico. Só o `.env.example` (sem valores) vai para o git.
+- Ao rodar `python3 run.py` numa pasta com `git init`, ele instala um `pre-commit` que **bloqueia** o commit se achar `.env`, banco, token do Telegram, chave de 64 caracteres, webhook do Slack ou cookie `cf_clearance`. Para rodar à mão: `python3 scripts/git_guard.py`.
+- Chave que já foi colada em chat, print ou commit deve ser trocada (revogue e gere outra).
 
 ## Estender
 

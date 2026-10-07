@@ -53,7 +53,7 @@ def main() -> None:
             report[step] = {"error": str(exc), "raw": prov.last_raw}
             print("erro:", exc)
     out = Path("skiplagged_probe.json")
-    out.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str)[:900_000])
+    out.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str)[:900_000], encoding="utf-8")
     print(f"\nSalvei {out}. Me mande esse arquivo.")
 
 

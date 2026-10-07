@@ -84,7 +84,7 @@ def ensure_deps(req_name: str = "requirements.txt") -> None:
     if not req.exists():
         die(f"{req_name} não encontrado em {ROOT}.")
     stamp = VENV / f".installed_{req_name}"
-    if stamp.exists() and stamp.read_text().strip() == _hash(req):
+    if stamp.exists() and stamp.read_text(encoding="utf-8").strip() == _hash(req):
         return
     say("Instalando dependências (só na primeira vez ou quando mudarem)...")
     r = subprocess.run(
@@ -93,7 +93,7 @@ def ensure_deps(req_name: str = "requirements.txt") -> None:
     if r.returncode != 0:
         die("Falha ao instalar as dependências. Veja a mensagem do pip acima (internet ok?) "
             "e rode de novo; ele continua de onde parou.")
-    stamp.write_text(_hash(req))
+    stamp.write_text(_hash(req), encoding="utf-8")
 
 
 # --------------------------------------------------------------------------
@@ -172,7 +172,8 @@ def ensure_git_guard() -> None:
     if not hooks.is_dir() or not guard.exists():
         return
     hook = hooks / "pre-commit"
-    body = f'#!/bin/sh\n{GUARD_MARK}\nexec python3 "{guard}"\n'
+    py = Path(sys.executable).as_posix()  # caminho real do Python (no Windows não existe "python3")
+    body = f'#!/bin/sh\n{GUARD_MARK}\nexec "{py}" "{guard.as_posix()}"\n'
     try:
         if hook.exists() and GUARD_MARK not in hook.read_text(encoding="utf-8"):
             say("Já existe um pre-commit seu; não mexi. Rode scripts/git_guard.py nele se quiser a trava.")
@@ -197,7 +198,8 @@ def needs_serpapi(args: list[str]) -> bool:
 
 def run(cmd: list[str]) -> int:
     try:
-        return subprocess.call(cmd, cwd=str(ROOT))
+        env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}  # acentos e símbolos no Windows
+        return subprocess.call(cmd, cwd=str(ROOT), env=env)
     except KeyboardInterrupt:
         return 130
 

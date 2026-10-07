@@ -50,7 +50,7 @@ def main() -> None:
     except ValueError:
         print("Resposta não é JSON:", a.text[:200])
         return
-    Path("origem_probe.json").write_text(json.dumps(data, ensure_ascii=False, indent=2)[:900_000])
+    Path("origem_probe.json").write_text(json.dumps(data, ensure_ascii=False, indent=2)[:900_000], encoding="utf-8")
     print("Salvei origem_probe.json. Me mande esse arquivo.")
 
 

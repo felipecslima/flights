@@ -118,7 +118,7 @@ def test_fluxo_pesquisa_vendedores_alerta_historico(tmp_path):
     app.run()
 
     assert opened and opened[0].startswith("file://")      # POST montado em página local
-    page = next((tmp_path / "flight_alerts").glob("abrir_*.html")).read_text()
+    page = next((tmp_path / "flight_alerts").glob("abrir_*.html")).read_text(encoding="utf-8")
     assert "method=post" in page and 'name="a" value="1"' in page
 
     w = store.list_watches()

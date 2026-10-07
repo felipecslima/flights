@@ -49,7 +49,7 @@ def main():
         ct = rr.headers.get("Content-Type", "")
         print(f"  {c:<34} HTTP {rr.status_code} {ct[:40]}")
         report["candidates"][c] = {"status": rr.status_code, "type": ct, "head": rr.text[:300] if rr.ok else ""}
-    Path("promos_probe.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
+    Path("promos_probe.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print("\nSalvei promos_probe.json e promos_home.html. Me mande os dois.")
 
 

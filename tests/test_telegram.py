@@ -80,7 +80,7 @@ def test_envfile(tmp_path):
     write_key(p, "B", "2")
     write_key(p, "A", "3")
     assert read_key(p, "A") == "3" and read_key(p, "B") == "2"
-    assert p.read_text().count("A=") == 1
+    assert p.read_text(encoding="utf-8").count("A=") == 1
 
 
 # --------------------------------------------------------------------------
@@ -162,3 +162,26 @@ def test_ja_conectado_envia_teste(tmp_path, monkeypatch):
     app.run()
     assert FakeTelegram.instances[-1].sent[0][0] == "42"
     assert "conectado" in buf.getvalue() and TOKEN not in buf.getvalue()
+
+
+def test_token_ja_no_env_pula_a_pergunta(tmp_path, monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", TOKEN)
+    monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
+    FakeTelegram.fail_me_times = 0
+    app, opened, buf = make_app(tmp_path, ["5", "0"])   # nenhuma pergunta de token
+    app.run()
+    assert "Achei o token" in buf.getvalue()
+    assert read_key(tmp_path / ".env", "TELEGRAM_CHAT_ID") == "777"
+    monkeypatch.delenv("TELEGRAM_CHAT_ID")
+
+
+def test_token_salvo_recusado_pede_novo(tmp_path, monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", TOKEN)
+    monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
+    FakeTelegram.fail_me_times = 1                       # o token do .env falha uma vez
+    novo = "987654321:" + "B" * 35
+    app, _, buf = make_app(tmp_path, ["5", novo, "0"])
+    app.run()
+    assert "token recusado" in buf.getvalue()
+    assert read_key(tmp_path / ".env", "TELEGRAM_BOT_TOKEN") == novo
+    monkeypatch.delenv("TELEGRAM_BOT_TOKEN"); monkeypatch.delenv("TELEGRAM_CHAT_ID")
