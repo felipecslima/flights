@@ -1,0 +1,36 @@
+# Copie para config.yaml e ajuste.
+channels: [telegram, slack, email]   # use "console" para testar sem credenciais
+currency: BRL
+monthly_quota: 250          # plano grátis do SerpApi
+max_searches_per_run: 4     # 4 buscas x 2 execuções/dia x 30 = 240/mês
+db_path: flights.db
+
+defaults:
+  drop_pct: 25              # alerta se 25% abaixo da mediana histórica da rota
+  min_samples: 8            # só confia na mediana após 8 preços coletados
+  realert_drop_pct: 5       # não repete alerta da mesma busca sem cair >=5%
+  allow_hidden_city: false  # true = aceita "cidade escondida" (só ida, só bagagem de mão; a companhia proíbe)
+
+routes:
+  - origin: GRU
+    destination: SSA
+    depart_from: 2027-01-10
+    depart_to: 2027-02-28
+    step_days: 7            # testa uma data por semana (cada data = 1 busca)
+    trip_days: [7]          # ida e volta com 7 dias; omita para só ida
+    max_price: 900          # alerta direto se <= R$ 900
+    max_stops: 1
+
+  - origin: GRU
+    destination: BEL
+    depart_from: 2027-03-01
+    depart_to: 2027-04-30
+    step_days: 14
+    max_price: 700
+
+# Promoções do Passagens Imperdíveis (lê os cartões da página pública)
+deals:
+  enabled: false
+  keywords: ["São Paulo", "GRU", "Salvador"]   # só avisa promoções que citem algum termo; vazio = todas
+  max_price: 1500                              # ignora promoções acima disso (R$)
+  # pages: []   # páginas extras do site para ler (a inicial, as recentes e os finais de semana já vêm por padrão)

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Atalho: ./voos  (equivale a python3 run.py)
+DIR="$(cd "$(dirname "$0")" && pwd)"
+exec python3 "$DIR/run.py" "$@"

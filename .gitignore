@@ -1,0 +1,23 @@
+# segredos e dados pessoais: nunca vão para o git
+.env
+.env.*
+!.env.example
+config.yaml
+config.yaml.bak
+*.db
+*.log
+
+# ambiente e caches
+.venv/
+__pycache__/
+.pytest_cache/
+.DS_Store
+
+# saídas dos scripts de diagnóstico (podem ter dados da sua conta)
+*_probe.json
+*_probe.html
+promos_home.html
+origem_page.html
+page_probe.html
+com.joel.flights.plist
+Claude outputs/
